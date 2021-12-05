@@ -26,7 +26,7 @@ namespace compiler.CharReader
         public override void Start() 
         {
             position = -1;
-            currentLine = 1;
+            currentLineNumber = 1;
             currentPositionInLine = 0;
             currentChar = (char)0;
         }
@@ -41,9 +41,9 @@ namespace compiler.CharReader
                 return false;
             }
             currentChar = text[position];
-            if(currentChar == '\n') 
+            if(currentChar == '\n' || currentChar == '\r') 
             {
-                currentLine++;
+                currentLineNumber++;
                 currentPositionInLine = 0;
             }
             else 
@@ -51,6 +51,29 @@ namespace compiler.CharReader
                 currentPositionInLine++;
             }
             return true;
+        }
+
+        public override string GetStringFromPosition((int, int) position, int length)
+        {
+            int positionInString = -1;
+            int line = 1;
+
+            while (line != position.Item1)
+            {
+                positionInString += 1;
+
+                if (positionInString >= text.Length)
+                {
+                    throw new ArgumentOutOfRangeException();
+                }
+                if (text[positionInString] == '\n' || text[positionInString] == '\r')
+                {
+                    line += 1;
+                }
+            }
+            positionInString += position.Item2;
+
+            return text.Substring(positionInString, length);
         }
     }
 }

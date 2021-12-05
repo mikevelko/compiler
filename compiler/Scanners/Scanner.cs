@@ -10,14 +10,14 @@ namespace compiler.Scanners
 {
     public class Scanner : IScanner
     {
-        public Reader charReader;
+        public Reader reader;
         public Token token;
         public Dictionary<string, TokenType> KeywordTokens;
         public Dictionary<string, TokenType> SignsTokens;
-        public Scanner(Reader charReader) 
+        public Scanner(Reader reader) 
         {
-            this.charReader = charReader;
-            charReader.MoveToNextChar();
+            this.reader = reader;
+            reader.MoveToNextChar();
             token = null;
             KeywordTokens = new Dictionary<string, TokenType>();
             SignsTokens = new Dictionary<string, TokenType>();
@@ -58,25 +58,26 @@ namespace compiler.Scanners
 
             SignsTokens.Add(",", TokenType.COMMA);
         }
+        //podzielic na funkcje
         public bool NextToken()
         {
-            while (CharIsWhite(charReader.currentChar))
+            while (CharIsWhite(reader.currentChar))
             {
-                charReader.MoveToNextChar();
+                reader.MoveToNextChar();
             }
-            if (charReader.currentChar == (char)0)
+            if (reader.currentChar == (char)0)
             {
                 token = null;
                 return false;
             }
-            (int, int) position = (charReader.currentLine, charReader.currentPositionInLine);
-            if (char.IsLetter(charReader.currentChar)) 
+            (int, int) position = (reader.currentLineNumber, reader.currentPositionInLine);
+            if (char.IsLetter(reader.currentChar)) 
             {
                 StringBuilder stringBuilder = new StringBuilder();
-                while (char.IsLetterOrDigit(charReader.currentChar)) 
+                while (char.IsLetterOrDigit(reader.currentChar)) 
                 {
-                    stringBuilder.Append(charReader.currentChar);
-                    charReader.MoveToNextChar();
+                    stringBuilder.Append(reader.currentChar);
+                    reader.MoveToNextChar();
                 }
                 string text = stringBuilder.ToString();
                 TokenType type;
@@ -88,32 +89,33 @@ namespace compiler.Scanners
                 token = new Token(TokenType.IDENTIFIER, text, position);
                 return true;
             }
-            if (char.IsDigit(charReader.currentChar)) 
+            if (char.IsDigit(reader.currentChar)) 
             {
                 StringBuilder stringBuilder = new StringBuilder();
                 bool isDouble = false;
-                while (char.IsDigit(charReader.currentChar)) 
+                //dodac obsluge np 0007 oraz przerobic na wartosc od razu 
+                while (char.IsDigit(reader.currentChar)) 
                 {
-                    stringBuilder.Append(charReader.currentChar);
-                    charReader.MoveToNextChar();
+                    stringBuilder.Append(reader.currentChar);
+                    reader.MoveToNextChar();
                 }
-                if(charReader.currentChar == '.') 
+                if(reader.currentChar == '.') 
                 {
-                    stringBuilder.Append(charReader.currentChar);
-                    charReader.MoveToNextChar();
+                    stringBuilder.Append(reader.currentChar);
+                    reader.MoveToNextChar();
                     isDouble = true;
                 }
-                while (char.IsDigit(charReader.currentChar))
+                while (char.IsDigit(reader.currentChar))
                 {
-                    stringBuilder.Append(charReader.currentChar);
-                    charReader.MoveToNextChar();
+                    stringBuilder.Append(reader.currentChar);
+                    reader.MoveToNextChar();
                 }
-                if (char.IsLetter(charReader.currentChar)) 
+                if (char.IsLetter(reader.currentChar)) 
                 {
-                    while (char.IsLetterOrDigit(charReader.currentChar)) 
+                    while (char.IsLetterOrDigit(reader.currentChar)) 
                     {
-                        stringBuilder.Append(charReader.currentChar);
-                        charReader.MoveToNextChar();
+                        stringBuilder.Append(reader.currentChar);
+                        reader.MoveToNextChar();
                     }
                     token = new Token(TokenType.UNKNOWN, stringBuilder.ToString(), position);
                     return true;
@@ -128,9 +130,10 @@ namespace compiler.Scanners
                 }
                 return true;
             }
-            if (CharIsBracket(charReader.currentChar))
+            //zrobic w jednym 
+            if (CharIsBracket(reader.currentChar))
             {
-                string text = charReader.currentChar.ToString();
+                string text = reader.currentChar.ToString();
                 TokenType type;
                 if (!SignsTokens.TryGetValue(text, out type))
                 {
@@ -139,19 +142,19 @@ namespace compiler.Scanners
 
                 token = new Token(type, text, position);
 
-                charReader.MoveToNextChar();
+                reader.MoveToNextChar();
 
                 return true;
             }
-            if (CharIsCorrectSign(charReader.currentChar)) 
+            if (CharIsCorrectSign(reader.currentChar)) 
             {
-                if (CharIsCorrectSign(charReader.currentChar))
+                if (CharIsCorrectSign(reader.currentChar))
                 {
                     StringBuilder stringBuilder = new StringBuilder();
-                    while (CharIsCorrectSign(charReader.currentChar))
+                    while (CharIsCorrectSign(reader.currentChar))
                     {
-                        stringBuilder.Append(charReader.currentChar);
-                        charReader.MoveToNextChar();
+                        stringBuilder.Append(reader.currentChar);
+                        reader.MoveToNextChar();
                     }
                     string text = stringBuilder.ToString();
 
@@ -171,8 +174,8 @@ namespace compiler.Scanners
             }
 
 
-            token = new Token(TokenType.UNKNOWN, charReader.currentChar.ToString(), position);
-            charReader.MoveToNextChar();
+            token = new Token(TokenType.UNKNOWN, reader.currentChar.ToString(), position);
+            reader.MoveToNextChar();
 
             // TODO: Commit incorect sign error to IError
 
@@ -181,7 +184,7 @@ namespace compiler.Scanners
 
 
 
-
+        //do poprawy
         bool CharIsWhite(char c)
         {
             if (char.IsWhiteSpace(c) || char.IsSeparator(c) || c == '\t' || c == '\n')

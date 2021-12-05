@@ -18,7 +18,7 @@ namespace compilerTests
         {
             CharReader charReader = new CharReader("text");
             charReader.Start();
-            Assert.AreEqual(charReader.currentLine, 1);
+            Assert.AreEqual(charReader.currentLineNumber, 1);
             Assert.AreEqual(charReader.currentPositionInLine, 0);
             Assert.AreEqual(charReader.position, -1);
         }
@@ -30,12 +30,12 @@ namespace compilerTests
             charReader.MoveToNextChar();
             Assert.AreEqual(charReader.currentChar, 'a');
             Assert.AreEqual(charReader.position, 0);
-            Assert.AreEqual(charReader.currentLine, 1);
+            Assert.AreEqual(charReader.currentLineNumber, 1);
             Assert.AreEqual(charReader.currentPositionInLine, 1);
             charReader.MoveToNextChar();
             Assert.AreEqual(charReader.currentChar, '=');
             Assert.AreEqual(charReader.position, 1);
-            Assert.AreEqual(charReader.currentLine, 1);
+            Assert.AreEqual(charReader.currentLineNumber, 1);
             Assert.AreEqual(charReader.currentPositionInLine, 2);
         }
         [TestMethod]
@@ -47,7 +47,7 @@ namespace compilerTests
             charReader.MoveToNextChar();
             Assert.AreEqual(charReader.currentChar, 'a');
             Assert.AreEqual(charReader.position, 1);
-            Assert.AreEqual(charReader.currentLine, 2);
+            Assert.AreEqual(charReader.currentLineNumber, 2);
             Assert.AreEqual(charReader.currentPositionInLine, 1);
         }
     }

@@ -55,13 +55,27 @@ namespace compiler.Tokens
     public class Token
     {
         public TokenType tokenType;
-        public string text;
+        public string text; //dla double i int przejsc na ten typ
+        public int intValue;
+        public double doubleValue;
         public (int, int) position;
 
         public Token(TokenType tokenType, string text, (int,int) position) 
         {
             this.tokenType = tokenType;
             this.text = text;
+            this.position = position;
+        }
+        public Token(TokenType tokenType, int value, (int, int) position)
+        {
+            this.tokenType = tokenType;
+            this.intValue = value;
+            this.position = position;
+        }
+        public Token(TokenType tokenType, double value, (int, int) position)
+        {
+            this.tokenType = tokenType;
+            this.doubleValue = value;
             this.position = position;
         }
     }
