@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace compiler.Scanners
 {
-    interface IScanner
+    public interface IScanner
     {
         bool NextToken();
     }
