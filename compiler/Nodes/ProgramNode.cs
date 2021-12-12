@@ -9,7 +9,7 @@ namespace compiler.Nodes
 {
     public class ProgramNode
     {
-        List<FunctionNode> functionNodes;
+        public List<FunctionNode> functionNodes;
         public ProgramNode(List<FunctionNode> functionNodes) 
         {
             this.functionNodes = functionNodes;

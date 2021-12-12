@@ -1,1 +1,2 @@
-int main(double argument) {}
+int main() { int a 
+ a = -(a * 3 + 4) }

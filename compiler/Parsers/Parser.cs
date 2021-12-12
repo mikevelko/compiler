@@ -106,7 +106,7 @@ namespace compiler.Parsers
         }
         private InstructionsBlockNode CreateInstructionsBlockNode() 
         {
-            scanner.NextToken();
+            //scanner.NextToken();
             if(scanner.token.tokenType != TokenType.LEFT_CURLY_BRACKET) 
             {
                 // obsluga bledu 
@@ -147,11 +147,15 @@ namespace compiler.Parsers
             }
             else if(scanner.token.tokenType == TokenType.INT || scanner.token.tokenType == TokenType.DOUBLE) 
             {
-                return CreateVariableDefinitionNode();
+                //scanner.NextToken();
+                VariableDefinitionNode variableDefinitionNode = CreateVariableDefinitionNode();
+                scanner.NextToken();
+                return variableDefinitionNode;
+                
             }
             else if(scanner.token.tokenType == TokenType.IDENTIFIER) 
             {
-
+                return CreateIdentifierAssignmentOrInvocationNode();
             }
             return null;
         }
@@ -168,6 +172,7 @@ namespace compiler.Parsers
             {
                 //obsluga bledu
             }
+            scanner.NextToken();
             InstructionsBlockNode instructionsBlockNode = CreateInstructionsBlockNode();
             ElseNode optionalElseNode = CreateElseNode();
             if(optionalElseNode == null) 
@@ -183,6 +188,7 @@ namespace compiler.Parsers
             {
                 return null;
             }
+            scanner.NextToken();
             InstructionsBlockNode instructionsBlockNode = CreateInstructionsBlockNode();
             return new ElseNode(instructionsBlockNode);
         }
@@ -193,16 +199,19 @@ namespace compiler.Parsers
             {
                 //obsluga bledu
             }
+            scanner.NextToken();
             IExpressionNode expression = TryToCreateExpressionNode();
             if(scanner.token.tokenType != TokenType.RIGHT_ROUND_BRACKET) 
             {
                 // obsluga bledu
             }
+            scanner.NextToken();
             InstructionsBlockNode instructionsBlockNode = CreateInstructionsBlockNode();
             return new WhileNode(expression, instructionsBlockNode);
         }
         private ReturnNode CreateReturnNode() 
         {
+            scanner.NextToken();
             IExpressionNode expression = TryToCreateExpressionNode();
             return new ReturnNode(expression);
         }
@@ -218,8 +227,9 @@ namespace compiler.Parsers
             //var assignment scope
             if(scanner.token.tokenType == TokenType.ASSIGN) 
             {
+                Token assignOperator = scanner.token;
                 scanner.NextToken();
-                return new VarAssignmentOrFuncInvocationNode(TryToCreateExpressionNode());
+                return new VarAssignmentOrFuncInvocationNode(TryToCreateExpressionNode(),assignOperator);
             }
             else if(scanner.token.tokenType == TokenType.LEFT_ROUND_BRACKET) 
             {
@@ -277,6 +287,7 @@ namespace compiler.Parsers
             while (scanner.token.tokenType == TokenType.OR)
             {
                 Token operatorToken = scanner.token;
+                scanner.NextToken();
                 IExpressionNode right = TryToCreateAndExpressionNode();
                 if(right == null) 
                 {
@@ -296,6 +307,7 @@ namespace compiler.Parsers
             while (scanner.token.tokenType == TokenType.AND)
             {
                 Token operatorToken = scanner.token;
+                scanner.NextToken();
                 IExpressionNode right = TryToCreateLogicNegationExpressionNode();
                 if (right == null)
                 {
@@ -326,7 +338,8 @@ namespace compiler.Parsers
                 scanner.token.tokenType == TokenType.MORE_EQUAL || scanner.token.tokenType == TokenType.LESS || scanner.token.tokenType == TokenType.LESS_EQUAL)
             {
                 Token operatorToken = scanner.token;
-                IExpressionNode right = TryToCreateAndExpressionNode();
+                scanner.NextToken();
+                IExpressionNode right = TryToCreateAddSubExpressionNode();
                 if (right == null)
                 {
                     //nie ma prawego - wyjatek
@@ -345,6 +358,7 @@ namespace compiler.Parsers
             while (scanner.token.tokenType == TokenType.PLUS || scanner.token.tokenType == TokenType.MINUS)
             {
                 Token operatorToken = scanner.token;
+                scanner.NextToken();
                 IExpressionNode right = TryToCreateMulDivExpressionNode();
                 if (right == null)
                 {
@@ -364,6 +378,7 @@ namespace compiler.Parsers
             while (scanner.token.tokenType == TokenType.MULTIPLE || scanner.token.tokenType == TokenType.DIVIDE)
             {
                 Token operatorToken = scanner.token;
+                scanner.NextToken();
                 IExpressionNode right = TryToCreateUnaryExpressionNode();
                 if (right == null)
                 {
@@ -406,7 +421,7 @@ namespace compiler.Parsers
             {
                 scanner.NextToken();
                 IExpressionNode expression = TryToCreateExpressionNode();
-                scanner.NextToken();
+                //scanner.NextToken();
                 if(scanner.token.tokenType != TokenType.RIGHT_ROUND_BRACKET) 
                 {
                     // obsluga bledu - brak nawiasu
