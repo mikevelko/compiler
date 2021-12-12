@@ -11,6 +11,6 @@ namespace compiler.Parsers
 {
     public interface IParser
     {
-        public SyntaxTree Parse(IScanner scanner);
+        public void Parse();
     }
 }

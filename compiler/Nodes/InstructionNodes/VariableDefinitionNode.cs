@@ -1,4 +1,5 @@
-﻿using compiler.Tokens;
+﻿using compiler.Nodes.Interfaces;
+using compiler.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace compiler.Nodes
 {
-    public class VariableDefinitionNode
+    public class VariableDefinitionNode : IInstructionNode
     {
         public TokenType variableType;
         public string identifier;

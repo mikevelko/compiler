@@ -1,19 +1,19 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using compiler.CharReader;
+using compiler.Parsers;
+using compiler.Scanners;
+using compiler.Tokens;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using compiler.CharReader;
 
 namespace compilerTests
 {
     [TestClass]
-    public class FileReaderTests
+    public class ParserTests
     {
         [TestMethod]
-        public void CreateFileReaderCorectly()
+        public void Parser_ShouldParseTokensCorrectly() 
         {
             if (!File.Exists("test.txt"))
             {
@@ -21,15 +21,18 @@ namespace compilerTests
 
                 using (StreamWriter sr = new StreamWriter("test.txt", false))
                 {
-                    sr.Write("int abc \n abc = 123");
+                    sr.Write("int main(double argument) {}");
                 }
             }
             try
             {
                 FileReader fileReader = new FileReader("test.txt");
-                Assert.AreEqual('\0', fileReader.currentChar);
+                Scanner scanner = new Scanner(fileReader);
+                Parser parser = new Parser(scanner);
+                parser.Parse();
+                Console.WriteLine("A");
             }
-            catch
+            catch 
             {
                 Assert.Fail("No error is need");
             }

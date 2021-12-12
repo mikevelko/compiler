@@ -1,2 +1,1 @@
-int abc 
- abc = 123
+int main(double argument) {}

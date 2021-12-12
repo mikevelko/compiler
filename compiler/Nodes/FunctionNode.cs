@@ -11,7 +11,15 @@ namespace compiler.Nodes
     {
         public TokenType returnType;
         public string identifier;
-        public List<ArgumentsListNode> argumentsListNodes;
-        public FunctionNode(List<Node> childrenNodes) : base(childrenNodes) { }
+        public ArgumentsListNode argumentsListNodes;
+        public InstructionsBlockNode instructionsBlockNode;
+
+        public FunctionNode(TokenType returnType, string identifier, ArgumentsListNode argumentsListNodes, InstructionsBlockNode instructionsBlockNode)
+        {
+            this.returnType = returnType;
+            this.identifier = identifier;
+            this.argumentsListNodes = argumentsListNodes;
+            this.instructionsBlockNode = instructionsBlockNode;
+        }
     }
 }
