@@ -19,6 +19,8 @@ namespace compiler.Tokens
         OR,
         AND,
 
+        NEGATION,
+
         EQUAL,
         NOT_EQUAL,
         MORE,

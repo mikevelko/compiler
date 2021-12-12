@@ -43,6 +43,7 @@ namespace compiler.Scanners
 
             SignsTokens.Add("&&", TokenType.AND);
             SignsTokens.Add("||", TokenType.OR);
+            SignsTokens.Add("!", TokenType.NEGATION);
 
             SignsTokens.Add("==", TokenType.EQUAL);
             SignsTokens.Add("!=", TokenType.NOT_EQUAL);

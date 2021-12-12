@@ -1,5 +1,6 @@
 ﻿using compiler.CharReader;
 using compiler.Nodes;
+using compiler.Nodes.ExpressionNodes;
 using compiler.Nodes.InstructionNodes;
 using compiler.Nodes.Interfaces;
 using compiler.Scanners;
@@ -162,7 +163,7 @@ namespace compiler.Parsers
                 // obsluga bledu
             }
             scanner.NextToken();
-            IExpressionNode expression = CreateExpressionNode();
+            IExpressionNode expression = TryToCreateExpressionNode();
             if(scanner.token.tokenType != TokenType.RIGHT_ROUND_BRACKET) 
             {
                 //obsluga bledu
@@ -192,7 +193,7 @@ namespace compiler.Parsers
             {
                 //obsluga bledu
             }
-            IExpressionNode expression = CreateExpressionNode();
+            IExpressionNode expression = TryToCreateExpressionNode();
             if(scanner.token.tokenType != TokenType.RIGHT_ROUND_BRACKET) 
             {
                 // obsluga bledu
@@ -202,7 +203,7 @@ namespace compiler.Parsers
         }
         private ReturnNode CreateReturnNode() 
         {
-            IExpressionNode expression = CreateExpressionNode();
+            IExpressionNode expression = TryToCreateExpressionNode();
             return new ReturnNode(expression);
         }
         private IdentifierAssignmentOrInvocationNode CreateIdentifierAssignmentOrInvocationNode() 
@@ -218,7 +219,7 @@ namespace compiler.Parsers
             if(scanner.token.tokenType == TokenType.ASSIGN) 
             {
                 scanner.NextToken();
-                return new VarAssignmentOrFuncInvocationNode(CreateExpressionNode());
+                return new VarAssignmentOrFuncInvocationNode(TryToCreateExpressionNode());
             }
             else if(scanner.token.tokenType == TokenType.LEFT_ROUND_BRACKET) 
             {
@@ -262,10 +263,156 @@ namespace compiler.Parsers
             }
             return new IdentifierListNode(identifiers);
         }
-        private IExpressionNode CreateExpressionNode() 
+        private IExpressionNode TryToCreateExpressionNode() 
         {
-            return null;
+            return TryToCreateOrExpressionNode();
         }
-        
+        private IExpressionNode TryToCreateOrExpressionNode() 
+        {
+            IExpressionNode left = TryToCreateAndExpressionNode();
+            if (left == null)
+            {
+                return null;
+            }
+            while (scanner.token.tokenType == TokenType.OR)
+            {
+                Token operatorToken = scanner.token;
+                IExpressionNode right = TryToCreateAndExpressionNode();
+                if(right == null) 
+                {
+                    //nie ma prawego - wyjatek
+                }
+                left = new OrExpressionNode(left, right, operatorToken);
+            }
+            return left;
+        }
+        private IExpressionNode TryToCreateAndExpressionNode() 
+        {
+            IExpressionNode left = TryToCreateLogicNegationExpressionNode();
+            if (left == null)
+            {
+                return null;
+            }
+            while (scanner.token.tokenType == TokenType.AND)
+            {
+                Token operatorToken = scanner.token;
+                IExpressionNode right = TryToCreateLogicNegationExpressionNode();
+                if (right == null)
+                {
+                    //nie ma prawego - wyjatek
+                }
+                left = new AndExpressionNode(left, right, operatorToken);
+            }
+            return left;
+        }
+        private IExpressionNode TryToCreateLogicNegationExpressionNode() 
+        {
+            if(scanner.token.tokenType == TokenType.NEGATION) 
+            {
+                Token operatorToken = scanner.token;
+                scanner.NextToken();
+                return new LogicNegationExpressionNode(TryToCreateComparisonExpressionNode(), operatorToken);
+            }
+            return TryToCreateComparisonExpressionNode();
+        }
+        private IExpressionNode TryToCreateComparisonExpressionNode() 
+        {
+            IExpressionNode left = TryToCreateAddSubExpressionNode();
+            if (left == null)
+            {
+                return null;
+            }
+            if (scanner.token.tokenType == TokenType.EQUAL || scanner.token.tokenType == TokenType.NOT_EQUAL || scanner.token.tokenType == TokenType.MORE ||
+                scanner.token.tokenType == TokenType.MORE_EQUAL || scanner.token.tokenType == TokenType.LESS || scanner.token.tokenType == TokenType.LESS_EQUAL)
+            {
+                Token operatorToken = scanner.token;
+                IExpressionNode right = TryToCreateAndExpressionNode();
+                if (right == null)
+                {
+                    //nie ma prawego - wyjatek
+                }
+                left = new ComparisonExpressionNode(left, right, operatorToken);
+            }
+            return left;
+        }
+        private IExpressionNode TryToCreateAddSubExpressionNode() 
+        {
+            IExpressionNode left = TryToCreateMulDivExpressionNode();
+            if (left == null)
+            {
+                return null;
+            }
+            while (scanner.token.tokenType == TokenType.PLUS || scanner.token.tokenType == TokenType.MINUS)
+            {
+                Token operatorToken = scanner.token;
+                IExpressionNode right = TryToCreateMulDivExpressionNode();
+                if (right == null)
+                {
+                    //nie ma prawego - wyjatek
+                }
+                left = new AddSubExpressionNode(left, right, operatorToken);
+            }
+            return left;
+        }
+        private IExpressionNode TryToCreateMulDivExpressionNode() 
+        {
+            IExpressionNode left = TryToCreateUnaryExpressionNode();
+            if (left == null)
+            {
+                return null;
+            }
+            while (scanner.token.tokenType == TokenType.MULTIPLE || scanner.token.tokenType == TokenType.DIVIDE)
+            {
+                Token operatorToken = scanner.token;
+                IExpressionNode right = TryToCreateUnaryExpressionNode();
+                if (right == null)
+                {
+                    //nie ma prawego - wyjatek
+                }
+                left = new MulDivExpressionNode(left, right, operatorToken);
+            }
+            return left;
+        }
+        private IExpressionNode TryToCreateUnaryExpressionNode() 
+        {
+            if (scanner.token.tokenType == TokenType.MINUS)
+            {
+                Token operatorToken = scanner.token;
+                scanner.NextToken();
+                return new UnaryExpressionNode(TryToCreateSimpleExpression(), operatorToken);
+            }
+            return TryToCreateSimpleExpression();
+        }
+        private IExpressionNode TryToCreateSimpleExpression() 
+        {
+            if(scanner.token.tokenType == TokenType.IDENTIFIER) 
+            {
+                IExpressionNode functionInvoc = CreateIdentifierAssignmentOrInvocationNode();
+                if(functionInvoc != null) 
+                {
+
+                }
+            }
+            if(scanner.token.tokenType == TokenType.NUMBER_INT || scanner.token.tokenType == TokenType.NUMBER_DOUBLE || scanner.token.tokenType == TokenType.IDENTIFIER) 
+            {
+                Token token = scanner.token;
+                scanner.NextToken();
+                return new SimpleExpressionNode(token);
+            }
+            if(scanner.token.tokenType == TokenType.LEFT_ROUND_BRACKET) 
+            {
+                scanner.NextToken();
+                IExpressionNode expression = TryToCreateExpressionNode();
+                scanner.NextToken();
+                if(scanner.token.tokenType != TokenType.RIGHT_ROUND_BRACKET) 
+                {
+                    // obsluga bledu - brak nawiasu
+                }
+                scanner.NextToken();
+                return expression;
+            }
+
+
+        }
     }
 }

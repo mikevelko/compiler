@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace compiler.Nodes.InstructionNodes
 {
-    public class IdentifierAssignmentOrInvocationNode : IInstructionNode
+    public class IdentifierAssignmentOrInvocationNode : IInstructionNode, IExpressionNode
     {
         public string identifier;
         public VarAssignmentOrFuncInvocationNode varAssignmentOrFuncInvocationNode;
