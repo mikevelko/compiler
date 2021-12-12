@@ -16,8 +16,8 @@ namespace compiler.Parsers
 {
     public class Parser : IParser
     {
-        Scanner scanner;
-        SyntaxTree syntaxTree;
+        public Scanner scanner;
+        public SyntaxTree syntaxTree;
         public Parser(Scanner scanner) 
         {
             this.scanner = scanner;
@@ -387,13 +387,16 @@ namespace compiler.Parsers
         {
             if(scanner.token.tokenType == TokenType.IDENTIFIER) 
             {
-                IExpressionNode functionInvoc = CreateIdentifierAssignmentOrInvocationNode();
-                if(functionInvoc != null) 
+                Token token = scanner.token;
+                scanner.NextToken();
+                if(scanner.token.tokenType == TokenType.LEFT_ROUND_BRACKET) 
                 {
-
+                    VarAssignmentOrFuncInvocationNode varAssignmentOrFuncInvocationNode = CreateVarAssignmentOrFuncInvocationNode();
+                    return new IdentifierAssignmentOrInvocationNode(token.text, varAssignmentOrFuncInvocationNode);
                 }
+                else return new SimpleExpressionNode(token);
             }
-            if(scanner.token.tokenType == TokenType.NUMBER_INT || scanner.token.tokenType == TokenType.NUMBER_DOUBLE || scanner.token.tokenType == TokenType.IDENTIFIER) 
+            if(scanner.token.tokenType == TokenType.NUMBER_INT || scanner.token.tokenType == TokenType.NUMBER_DOUBLE) 
             {
                 Token token = scanner.token;
                 scanner.NextToken();
@@ -411,7 +414,8 @@ namespace compiler.Parsers
                 scanner.NextToken();
                 return expression;
             }
-
+            //obsluga bledu 
+            return null;
 
         }
     }

@@ -2,6 +2,7 @@
 using compiler.Parsers;
 using compiler.Scanners;
 using compiler.Tokens;
+using compiler.Trees;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace compilerTests
     public class ParserTests
     {
         [TestMethod]
-        public void Parser_ShouldParseTokensCorrectly() 
+        public void Parser_ShouldParseTokensCorrectly_cleanMainWithArgument() 
         {
             if (!File.Exists("test.txt"))
             {
@@ -30,7 +31,7 @@ namespace compilerTests
                 Scanner scanner = new Scanner(fileReader);
                 Parser parser = new Parser(scanner);
                 parser.Parse();
-                Console.WriteLine("A");
+                SyntaxTree syntaxTreeResult = parser.syntaxTree;
             }
             catch 
             {
