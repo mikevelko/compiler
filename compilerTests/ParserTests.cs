@@ -172,7 +172,7 @@ namespace compilerTests
 
                 using (StreamWriter sr = new StreamWriter("test.txt", false))
                 {
-                    sr.Write("int main() { int a \n a = -(a * 3 + 4) }");
+                    sr.Write("int main() { int a \n a = -(a * 3 + 4) return 0 }");
                 }
             }
             try

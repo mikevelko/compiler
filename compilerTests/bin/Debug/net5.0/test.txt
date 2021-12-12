@@ -1,2 +1,2 @@
 int main() { int a 
- a = -(a * 3 + 4) }
+ a = -(a * 3 + 4) return 0 }
