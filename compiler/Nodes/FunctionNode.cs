@@ -1,4 +1,6 @@
-﻿using compiler.Tokens;
+﻿using compiler.Interpreter.Visitor;
+using compiler.Nodes.Interfaces;
+using compiler.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace compiler.Nodes
 {
-    public class FunctionNode : Node
+    public class FunctionNode : INode
     {
         public TokenType returnType;
         public string identifier;
@@ -20,6 +22,11 @@ namespace compiler.Nodes
             this.identifier = identifier;
             this.argumentsListNodes = argumentsListNodes;
             this.instructionsBlockNode = instructionsBlockNode;
+        }
+
+        public void Accept(IVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

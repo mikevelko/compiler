@@ -1,4 +1,5 @@
-﻿using compiler.Nodes.Interfaces;
+﻿using compiler.Interpreter.Visitor;
+using compiler.Nodes.Interfaces;
 using compiler.Tokens;
 using System;
 using System.Collections.Generic;
@@ -8,15 +9,20 @@ using System.Threading.Tasks;
 
 namespace compiler.Nodes.ExpressionNodes
 {
-    public class LogicNegationExpressionNode : IExpressionNode
+    public class LogicNegationExpressionNode : IExpressionNode, INode
     {
         public IExpressionNode left;
-        public Token operatorToken;
+        public (int,int) position;
 
         public LogicNegationExpressionNode(IExpressionNode left, Token operatorToken)
         {
             this.left = left;
-            this.operatorToken = operatorToken;
+            this.position = operatorToken.position;
+        }
+
+        public void Accept(IVisitor visitor)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -8,18 +8,18 @@ using System.Threading.Tasks;
 
 namespace compiler.Nodes.InstructionNodes
 {
-    public class ElseNode : IInstructionNode, INode
+    public class ParametersListNode : INode
     {
-        public InstructionsBlockNode InstructionsBlockNode;
+        public List<IExpressionNode> identifiers;
 
-        public ElseNode(InstructionsBlockNode instructionsBlockNode)
+        public ParametersListNode(List<IExpressionNode> identifiers)
         {
-            InstructionsBlockNode = instructionsBlockNode;
+            this.identifiers = identifiers;
         }
 
         public void Accept(IVisitor visitor)
         {
-            visitor.Visit(this);
+            throw new NotImplementedException();
         }
     }
 }

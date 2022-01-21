@@ -64,7 +64,10 @@ namespace compiler.Scanners
         {
             while (CharIsWhite(reader.currentChar))
             {
-                reader.MoveToNextChar();
+                if (!reader.MoveToNextChar()) 
+                {
+                    return false;
+                }
             }
             if (reader.currentChar == (char)0)
             {
@@ -123,11 +126,11 @@ namespace compiler.Scanners
                 }
                 if (isDouble) 
                 {
-                    token = new Token(TokenType.NUMBER_DOUBLE, stringBuilder.ToString(), position);
+                    token = new Token(TokenType.NUMBER_DOUBLE, Convert.ToDouble(stringBuilder.ToString()), position);
                 }
                 else 
                 {
-                    token = new Token(TokenType.NUMBER_INT, stringBuilder.ToString(), position);
+                    token = new Token(TokenType.NUMBER_INT, Convert.ToInt32(stringBuilder.ToString()), position);
                 }
                 return true;
             }
@@ -185,7 +188,7 @@ namespace compiler.Scanners
 
 
 
-        //do poprawy
+        
         bool CharIsWhite(char c)
         {
             if (char.IsWhiteSpace(c) || char.IsSeparator(c) || c == '\t' || c == '\n')

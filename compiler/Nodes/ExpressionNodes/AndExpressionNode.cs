@@ -1,4 +1,5 @@
-﻿using compiler.Nodes.Interfaces;
+﻿using compiler.Interpreter.Visitor;
+using compiler.Nodes.Interfaces;
 using compiler.Tokens;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace compiler.Nodes.ExpressionNodes
 {
-    public class AndExpressionNode : IExpressionNode
+    public class AndExpressionNode : IExpressionNode, INode
     {
         public IExpressionNode left;
         public IExpressionNode right;
@@ -19,6 +20,11 @@ namespace compiler.Nodes.ExpressionNodes
             this.left = left;
             this.right = right;
             this.operatorToken = operatorToken;
+        }
+
+        public void Accept(IVisitor visitor)
+        {
+            throw new NotImplementedException();
         }
     }
 }

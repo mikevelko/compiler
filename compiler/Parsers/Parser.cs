@@ -1,6 +1,7 @@
 ﻿using compiler.CharReader;
 using compiler.Nodes;
 using compiler.Nodes.ExpressionNodes;
+using compiler.Nodes.ExpressionNodes.SimpleExpressionNodes;
 using compiler.Nodes.InstructionNodes;
 using compiler.Nodes.Interfaces;
 using compiler.Scanners;
@@ -36,6 +37,10 @@ namespace compiler.Parsers
             while (f != null) 
             {
                 functionList.Add(f);
+                if (!scanner.NextToken()) 
+                {
+                    break;
+                }
                 f = CreateFunctionNode();
             }
             
@@ -47,7 +52,6 @@ namespace compiler.Parsers
             Token returnValueToken = scanner.token;
             if (returnValueToken.tokenType == TokenType.INT || returnValueToken.tokenType == TokenType.DOUBLE) 
             {
-                
             }
             else 
             {
@@ -82,6 +86,12 @@ namespace compiler.Parsers
             while(variableDefinitionNode != null) 
             {
                 variableDefinitionNodes.Add(variableDefinitionNode);
+                //brakuje przycinku
+                if (scanner.token.tokenType != TokenType.COMMA) 
+                {
+                    return new ArgumentsListNode(variableDefinitionNodes);
+                }
+                
                 variableDefinitionNode = CreateVariableDefinitionNode();
             }
             return new ArgumentsListNode(variableDefinitionNodes);
@@ -97,6 +107,7 @@ namespace compiler.Parsers
                 {
                     // obsluga bledu
                 }
+                scanner.NextToken();
                 return new VariableDefinitionNode(typeName.tokenType, identifier.text);
             }
             else 
@@ -133,6 +144,7 @@ namespace compiler.Parsers
         }
         private IInstructionNode CreateInstructionNode() 
         {
+            //przeniesc if poziom nizej
             if(scanner.token.tokenType == TokenType.IF) 
             {
                 return CreateIfNode();
@@ -149,7 +161,7 @@ namespace compiler.Parsers
             {
                 //scanner.NextToken();
                 VariableDefinitionNode variableDefinitionNode = CreateVariableDefinitionNode();
-                scanner.NextToken();
+                //scanner.NextToken();
                 return variableDefinitionNode;
                 
             }
@@ -234,7 +246,7 @@ namespace compiler.Parsers
             else if(scanner.token.tokenType == TokenType.LEFT_ROUND_BRACKET) 
             {
                 scanner.NextToken();
-                return new VarAssignmentOrFuncInvocationNode(CreateIdentifierListNode());
+                return new VarAssignmentOrFuncInvocationNode(CreateParametersListNode());
             }
             else 
             {
@@ -242,27 +254,23 @@ namespace compiler.Parsers
                 return null;
             }
         }
-        private IdentifierListNode CreateIdentifierListNode() 
+        private ParametersListNode CreateParametersListNode() 
         {
-            List<string> identifiers = new();
-            while(scanner.token.tokenType == TokenType.IDENTIFIER) 
+            List<IExpressionNode> parameters = new();
+            IExpressionNode expression = TryToCreateExpressionNode();
+            while (expression != null) 
             {
-                identifiers.Add(scanner.token.text);
-                scanner.NextToken();
+                parameters.Add(expression);
+                //scanner.NextToken();
                 if (scanner.token.tokenType == TokenType.COMMA)
                 {
                     scanner.NextToken();
-                    if (scanner.token.tokenType == TokenType.IDENTIFIER)
-                    {
-                        continue;
-                    }
-                    else 
-                    {
-                        //obsluga bledu
-                    }
+                    expression = TryToCreateExpressionNode();
+                    continue;
                 }
                 if(scanner.token.tokenType == TokenType.RIGHT_ROUND_BRACKET) 
                 {
+                    scanner.NextToken();
                     break;
                 }
                 else
@@ -271,7 +279,11 @@ namespace compiler.Parsers
                 }
 
             }
-            return new IdentifierListNode(identifiers);
+            if (scanner.token.tokenType == TokenType.RIGHT_ROUND_BRACKET)
+            {
+                scanner.NextToken();
+            }
+            return new ParametersListNode(parameters);
         }
         private IExpressionNode TryToCreateExpressionNode() 
         {
@@ -323,6 +335,7 @@ namespace compiler.Parsers
             {
                 Token operatorToken = scanner.token;
                 scanner.NextToken();
+                //sprawdzic czy powstanie ComprasionExpressionNode
                 return new LogicNegationExpressionNode(TryToCreateComparisonExpressionNode(), operatorToken);
             }
             return TryToCreateComparisonExpressionNode();
@@ -394,6 +407,7 @@ namespace compiler.Parsers
             {
                 Token operatorToken = scanner.token;
                 scanner.NextToken();
+                //to samo sprawdzenie czy jest null
                 return new UnaryExpressionNode(TryToCreateSimpleExpression(), operatorToken);
             }
             return TryToCreateSimpleExpression();
@@ -407,17 +421,25 @@ namespace compiler.Parsers
                 if(scanner.token.tokenType == TokenType.LEFT_ROUND_BRACKET) 
                 {
                     VarAssignmentOrFuncInvocationNode varAssignmentOrFuncInvocationNode = CreateVarAssignmentOrFuncInvocationNode();
+                    //sprawdzic czy nie jest null
                     return new IdentifierAssignmentOrInvocationNode(token.text, varAssignmentOrFuncInvocationNode);
                 }
-                else return new SimpleExpressionNode(token);
+                else return new SimpleIdentifierNode(token);
             }
-            if(scanner.token.tokenType == TokenType.NUMBER_INT || scanner.token.tokenType == TokenType.NUMBER_DOUBLE) 
+            //rozdzielic SimpleExpressionNode na czesci
+            if(scanner.token.tokenType == TokenType.NUMBER_INT ) 
             {
                 Token token = scanner.token;
                 scanner.NextToken();
-                return new SimpleExpressionNode(token);
+                return new SimpleIntNode(token);
             }
-            if(scanner.token.tokenType == TokenType.LEFT_ROUND_BRACKET) 
+            else if (scanner.token.tokenType == TokenType.NUMBER_DOUBLE)
+            {
+                Token token = scanner.token;
+                scanner.NextToken();
+                return new SimpleDoubleNode(token);
+            }
+            if (scanner.token.tokenType == TokenType.LEFT_ROUND_BRACKET) 
             {
                 scanner.NextToken();
                 IExpressionNode expression = TryToCreateExpressionNode();

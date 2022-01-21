@@ -7,16 +7,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace compiler.Nodes
+namespace compiler.Nodes.ExpressionNodes.SimpleExpressionNodes
 {
-    public class VariableDefinitionNode : IInstructionNode, INode
+    public class SimpleIntNode : IExpressionNode, INode
     {
-        public TokenType variableType;
-        public string identifier;
-        public VariableDefinitionNode(TokenType variableType, string identifier) 
+        public int value;
+        public (int, int) position;
+
+        public SimpleIntNode(Token token)
         {
-            this.variableType = variableType;
-            this.identifier = identifier;
+            this.value = token.intValue;
+            this.position = token.position;
         }
 
         public void Accept(IVisitor visitor)

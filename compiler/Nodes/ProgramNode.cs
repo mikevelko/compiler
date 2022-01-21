@@ -1,4 +1,6 @@
-﻿using compiler.Scanners;
+﻿using compiler.Interpreter.Visitor;
+using compiler.Nodes.Interfaces;
+using compiler.Scanners;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace compiler.Nodes
 {
-    public class ProgramNode
+    public class ProgramNode : INode
     {
         public List<FunctionNode> functionNodes;
         public ProgramNode(List<FunctionNode> functionNodes) 
@@ -15,6 +17,9 @@ namespace compiler.Nodes
             this.functionNodes = functionNodes;
         }
 
-        
+        public void Accept(IVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using compiler.Nodes.Interfaces;
+﻿using compiler.Interpreter.Visitor;
+using compiler.Nodes.Interfaces;
 using compiler.Tokens;
 using System;
 using System.Collections.Generic;
@@ -8,21 +9,26 @@ using System.Threading.Tasks;
 
 namespace compiler.Nodes.InstructionNodes
 {
-    public class VarAssignmentOrFuncInvocationNode
+    public class VarAssignmentOrFuncInvocationNode : INode, IInstructionNode
     {
         public IExpressionNode expression;
-        public Token operatorAssignment;
-        public IdentifierListNode identifierListNode;
+        public (int, int) position;
+        public ParametersListNode identifierListNode;
 
         public VarAssignmentOrFuncInvocationNode(IExpressionNode expression, Token operatorAssignment)
         {
             this.expression = expression;
-            this.operatorAssignment = operatorAssignment;
+            this.position = operatorAssignment.position;
         }
 
-        public VarAssignmentOrFuncInvocationNode(IdentifierListNode identifierListNode)
+        public VarAssignmentOrFuncInvocationNode(ParametersListNode identifierListNode)
         {
             this.identifierListNode = identifierListNode;
+        }
+
+        public void Accept(IVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

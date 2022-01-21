@@ -1,4 +1,5 @@
-﻿using compiler.Nodes.Interfaces;
+﻿using compiler.Interpreter.Visitor;
+using compiler.Nodes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace compiler.Nodes.InstructionNodes
 {
-    public class IdentifierAssignmentOrInvocationNode : IInstructionNode, IExpressionNode
+    public class IdentifierAssignmentOrInvocationNode : IInstructionNode, IExpressionNode, INode
     {
         public string identifier;
         public VarAssignmentOrFuncInvocationNode varAssignmentOrFuncInvocationNode;
@@ -16,6 +17,11 @@ namespace compiler.Nodes.InstructionNodes
         {
             this.identifier = identifier;
             this.varAssignmentOrFuncInvocationNode = varAssignmentOrFuncInvocationNode;
+        }
+
+        public void Accept(IVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

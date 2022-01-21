@@ -1,4 +1,5 @@
-﻿using compiler.Nodes.Interfaces;
+﻿using compiler.Interpreter.Visitor;
+using compiler.Nodes.Interfaces;
 using compiler.Tokens;
 using System;
 using System.Collections.Generic;
@@ -8,17 +9,22 @@ using System.Threading.Tasks;
 
 namespace compiler.Nodes.ExpressionNodes
 {
-    class ComparisonExpressionNode : IExpressionNode
+    public class ComparisonExpressionNode : IExpressionNode, INode
     {
-        IExpressionNode left;
-        IExpressionNode right;
-        Token relativeOperator;
+        public IExpressionNode left;
+        public IExpressionNode right;
+        public Token relativeOperator;
 
         public ComparisonExpressionNode(IExpressionNode left, IExpressionNode right, Token relativeOperator)
         {
             this.left = left;
             this.right = right;
             this.relativeOperator = relativeOperator;
+        }
+
+        public void Accept(IVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

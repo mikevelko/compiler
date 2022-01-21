@@ -1,4 +1,5 @@
-﻿using compiler.Nodes.Interfaces;
+﻿using compiler.Interpreter.Visitor;
+using compiler.Nodes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace compiler.Nodes.InstructionNodes
 {
-    public class IfNode : IInstructionNode
+    public class IfNode : IInstructionNode, INode
     {
         public IExpressionNode expressionNode;
         public InstructionsBlockNode instructionsBlockNode;
@@ -24,6 +25,11 @@ namespace compiler.Nodes.InstructionNodes
         {
             this.expressionNode = expressionNode;
             this.instructionsBlockNode = instructionsBlockNode;
+        }
+
+        public void Accept(IVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

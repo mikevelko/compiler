@@ -7,17 +7,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace compiler.Nodes.ExpressionNodes
+namespace compiler.Nodes.ExpressionNodes.SimpleExpressionNodes
 {
-    public class UnaryExpressionNode : IExpressionNode, INode
+    public class SimpleIdentifierNode : IExpressionNode, INode
     {
-        public IExpressionNode left;
+        public string value;
         public (int, int) position;
 
-        public UnaryExpressionNode(IExpressionNode left, Token operatorToken)
+        public SimpleIdentifierNode(Token token)
         {
-            this.left = left;
-            this.position = operatorToken.position;
+            this.value = token.text;
+            this.position = token.position;
         }
 
         public void Accept(IVisitor visitor)

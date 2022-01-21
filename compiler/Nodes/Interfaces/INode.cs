@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace compiler.Nodes.Interfaces
 {
-    public interface IExpressionNode : INode
+    public interface INode
     {
-        
+        void Accept(IVisitor visitor);
     }
 }

@@ -11,6 +11,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using compiler.Nodes.ExpressionNodes.SimpleExpressionNodes;
 
 namespace compilerTests
 {
@@ -46,7 +47,7 @@ namespace compilerTests
                 VariableDefinitionNode variableDefinitionNode = new VariableDefinitionNode(TokenType.INT, "a");
                 instructionNodes.Add(variableDefinitionNode);
 
-                SimpleExpressionNode expressionNode = new SimpleExpressionNode(new Token(TokenType.NUMBER_INT, "4", (1, 22)));
+                SimpleIntNode expressionNode = new SimpleIntNode(new Token(TokenType.NUMBER_INT, 4, (1, 12)));
                 VarAssignmentOrFuncInvocationNode varAssignmentOrFuncInvocationNode = new VarAssignmentOrFuncInvocationNode(expressionNode, new Token(TokenType.ASSIGN, "=", (1, 21)));
                 IdentifierAssignmentOrInvocationNode identifierAssignmentOrInvocationNode = new IdentifierAssignmentOrInvocationNode("a", varAssignmentOrFuncInvocationNode);
 
@@ -82,7 +83,7 @@ namespace compilerTests
 
                 using (StreamWriter sr = new StreamWriter("test.txt", false))
                 {
-                    sr.Write("int main() { int a \n if(1>2) { a=100 } \r else { a=12 } }");
+                    sr.Write("int main() { int a if(5>4) {} }");
                 }
             }
             try
@@ -172,7 +173,7 @@ namespace compilerTests
 
                 using (StreamWriter sr = new StreamWriter("test.txt", false))
                 {
-                    sr.Write("int main() { int a \n a = -(a * 3 + 4) return 0 }");
+                    sr.Write("int main() { int a \n a = -(a * 3 + 4) return a+1 }");
                 }
             }
             try
