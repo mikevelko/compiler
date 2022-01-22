@@ -39,19 +39,24 @@ namespace compiler.Interpreter.Visitor
                 if(functionNode == null) 
                 {
                     //wyjatek - jakiś node z def funkcji jest pusty
-                    
+                    throw new Exception("Some node from function definitions is empty");
                 }
                 if(functionNode.identifier == "main") 
                 {
                     if(main != null) 
                     {
-                        //wyjatek - there is not 1 main function
+                        //wyjatek - there is more than 1 main function
+                        throw new Exception("there is more than 1 main function");
                     }
                     main = functionNode;
                     
                     
                 }
                 functionDefinitions.Add(functionNode);
+            }
+            if(main == null) 
+            {
+                throw new Exception("no main function");
             }
             main.Accept(this);
             if (IsFunctionReturned) 
@@ -68,6 +73,7 @@ namespace compiler.Interpreter.Visitor
             else 
             {
                 // wyjatek - nie ma return w mainuie 
+                throw new Exception("no return in main");
             }
         }
 
@@ -85,7 +91,7 @@ namespace compiler.Interpreter.Visitor
             if(instructionsBlockNode == null)
             {
                 // wyjatek instructionsBlockNode = null
-                Console.WriteLine("instructionsBlockNode = null");
+                throw new Exception("instructionsBlockNode = null");
             }
             instructionsBlockNode.instructionsList.Accept(this);
         }
@@ -95,7 +101,7 @@ namespace compiler.Interpreter.Visitor
             if (instructionsListNode == null)
             {
                 // wyjatek instructionsListNode = null
-                Console.WriteLine("instructionsListNode = null");
+                throw new Exception("instructionsListNode = null");
             }
             foreach(IInstructionNode instruction in instructionsListNode.instructionNodes) 
             {
@@ -113,7 +119,7 @@ namespace compiler.Interpreter.Visitor
             if (VariableExistsInCurrentFCC(variableDefinitionNode.identifier)) 
             {
                 //wyjatek zmienna juz istnieje a sprobojemy zdefionowac ją ponownie
-                Console.WriteLine("variable with this name already exists - " + variableDefinitionNode.identifier);
+                throw new Exception("redifine of variable" + variableDefinitionNode.identifier);
             }
             if(variableDefinitionNode.variableType == TokenType.INT) 
             {
@@ -134,6 +140,7 @@ namespace compiler.Interpreter.Visitor
             if(ifNode == null) 
             {
                 //wyjatek ifNode jest pusty
+                throw new Exception("ifNode jest pusty");
             }
             lastExpressionValues.Add(new LastExpressionValueInt(1));
             ifNode.expressionNode.Accept(this);
@@ -170,6 +177,7 @@ namespace compiler.Interpreter.Visitor
             if(whileNode == null)
             {
                 //wyjatek
+                throw new Exception("whileNode jest pusty");
             }
             lastExpressionValues.Add(new LastExpressionValueInt(1));
             whileNode.expressionNode.Accept(this);
@@ -200,15 +208,17 @@ namespace compiler.Interpreter.Visitor
                 if(!TrySetValueOfVariable(varName,GetLastExpressionType(),GetLastExpressionValue())) 
                 {
                     //wyjatek - nie ma zmiennej o nazwie varName albo sprobojemy przypisac do zmiennej wartosc innego typu
+                    throw new Exception("There is no variable - " + varName + " or we are trying to assign value of another type to it");
                 }
                 ConsumeLastExpressionValue();
             }
             //wywolanie funkcji
             else if(identifierAssignmentOrInvocationNode.varAssignmentOrFuncInvocationNode.parametersListNode != null) 
             {
-                if (!FunctionDefinitionExists(identifierAssignmentOrInvocationNode.identifier)) 
+                if (!FunctionDefinitionExists(identifierAssignmentOrInvocationNode.identifier) && identifierAssignmentOrInvocationNode.identifier != "print") 
                 {
                     // wyjatek - nie ma definicji funkcji z taką nazwą 
+                    throw new Exception("There is no func definition : " + identifierAssignmentOrInvocationNode.identifier);
                 }
                 CreateParametersList(identifierAssignmentOrInvocationNode.varAssignmentOrFuncInvocationNode.parametersListNode, identifierAssignmentOrInvocationNode.identifier);
                 if (IsPrintInvoked) 
@@ -227,7 +237,8 @@ namespace compiler.Interpreter.Visitor
             {
                 if(parametersListNode.expressionFunctionParameters.Count != 1) 
                 {
-                    // wyjatek - liczba argumentow funkcji print nie jest 0
+                    // wyjatek - liczba argumentow funkcji print nie jest 1
+                    throw new Exception("print can take only one parameter");
                 }
                 if(parametersListNode.expressionFunctionParameters[0] is SimpleIdentifierNode) 
                 {
@@ -237,6 +248,7 @@ namespace compiler.Interpreter.Visitor
                 else
                 {
                     // wyjatek - zly typ argumentu w print
+                    throw new Exception("wrong type in print argument");
                 }
                 return;
             }
@@ -247,6 +259,7 @@ namespace compiler.Interpreter.Visitor
             if (parametersListNode.expressionFunctionParameters.Count != funcDef.argumentsListNodes.variableDefinitionNodes.Count())
             {
                 //wyjatek arguments count is not the same in definition and invocation
+                throw new Exception("arguments count is not the same in definition and invocation");
             }
             int ParameterIndex = 0;
             foreach (IExpressionNode expression in parametersListNode.expressionFunctionParameters)
@@ -258,10 +271,12 @@ namespace compiler.Interpreter.Visitor
                 if (ParameterIndex == funcDef.argumentsListNodes.variableDefinitionNodes.Count)
                 {
                     //wyjatek definicja funkcji ma mniej parametrow niz w wywolaniu 
+                    throw new Exception("Function definition has less arguments than in invocation");
                 }
                 if(parameters.FindIndex(t => t.identifier == funcDef.argumentsListNodes.variableDefinitionNodes[ParameterIndex].identifier) >= 0) 
                 {
                     //wyjatek definicja funkcji zawiera parametry z taką samą nazwą
+                    throw new Exception("Function definition has arguments with the same name");
                 }
                 if (funcDef.argumentsListNodes.variableDefinitionNodes[ParameterIndex].variableType == TokenType.INT && ArgType == ValueType.INT)
                 {
@@ -274,6 +289,7 @@ namespace compiler.Interpreter.Visitor
                 else
                 {
                     // wyjatek - typ argumentu w definicji funkcji się nie zgadza z type argumentu w wywolaniu
+                    throw new Exception(funcDef.argumentsListNodes.variableDefinitionNodes[ParameterIndex].identifier + " - has another type in function invoc than in definition");
                 }
                 ParameterIndex++;
             }
@@ -310,6 +326,7 @@ namespace compiler.Interpreter.Visitor
             else 
             {
                 // wyjatek - funkcja nic nie zwraca
+                throw new Exception("Function is not returning anything");
             }
         }
 
@@ -318,12 +335,14 @@ namespace compiler.Interpreter.Visitor
             if(returnNode == null) 
             {
                 //wyjatek returnNode jest pusty 
+                throw new Exception("returnNode is null");
             }
             returnNode.expression.Accept(this);
             ValueType returnType = GetLastExpressionType();
             if (!IsFunctionReturnTypeCorrect(returnType)) 
             {
                 // wyjatek - zwracany typ wartosci nie zgadza się ze zwracanym typem funkcji
+                throw new Exception("Return value is not the same type as function type");
             }
             IsFunctionReturned = true;
         }
@@ -336,6 +355,7 @@ namespace compiler.Interpreter.Visitor
             if(simpleIntNode == null) 
             {
                 //wyjatek jest pusty 
+                throw new Exception("simpleIntNode is null");
             }
             ConsumeLastExpressionValue();
             lastExpressionValues.Add(new LastExpressionValueInt(simpleIntNode.value));
@@ -345,6 +365,7 @@ namespace compiler.Interpreter.Visitor
             if(simpleDoubleNode == null) 
             {
                 // jest pusty
+                throw new Exception("simpleDoubleNode is null");
             }
             ConsumeLastExpressionValue();
             lastExpressionValues.Add(new LastExpressionValueDouble(simpleDoubleNode.value));
@@ -354,6 +375,7 @@ namespace compiler.Interpreter.Visitor
             if(simpleIdentifierNode == null) 
             {
                 //jest pusty
+                throw new Exception("simpleIdentifierNode is null");
             }
             ConsumeLastExpressionValue();
             foreach (FunctionScope functionScope in functionCallContexts.Peek().functionScopes)
@@ -373,6 +395,7 @@ namespace compiler.Interpreter.Visitor
                 else 
                 {
                     // wyjatek - nie ma zmiennej o nazwie 
+                    throw new Exception("There is no variable - " + simpleIdentifierNode.value + "in current scope");
                 }
             }
             
@@ -383,6 +406,7 @@ namespace compiler.Interpreter.Visitor
             if(andExpressionNode == null) 
             {
                 // pusty Node
+                throw new Exception("wrong type in print argument");
             }
             andExpressionNode.left.Accept(this);
             double leftValue = GetLastExpressionValue();
@@ -405,6 +429,7 @@ namespace compiler.Interpreter.Visitor
             if (orExpressionNode == null)
             {
                 // pusty Node
+                throw new Exception("wrong type in print argument");
             }
             orExpressionNode.left.Accept(this);
             double leftValue = GetLastExpressionValue();
@@ -427,6 +452,7 @@ namespace compiler.Interpreter.Visitor
             if (logicNegationExpressionNode == null)
             {
                 // pusty Node
+                throw new Exception("logicNegationExpressionNode is null");
             }
             logicNegationExpressionNode.left.Accept(this);
             double leftValue = GetLastExpressionValue();
@@ -435,6 +461,7 @@ namespace compiler.Interpreter.Visitor
             if(valueType != ValueType.INT) 
             {
                 //wyjatek - logic negations na double , powinno być int 0 lub 1
+                throw new Exception("Can't apply logic negation to double value");
             }
             if(leftValue == 0) 
             {
@@ -447,6 +474,7 @@ namespace compiler.Interpreter.Visitor
             else 
             {
                 //wyjatek - negacja dla wartosci roznej od 0 lub 1
+                throw new Exception("Negation applied for value that is not INT(0,1)");
             }
         }
 
@@ -455,6 +483,7 @@ namespace compiler.Interpreter.Visitor
             if (comparisonExpressionNode == null)
             {
                 //wyjatek jest pusty 
+                throw new Exception("comparisonExpressionNode is null");
             }
             comparisonExpressionNode.left.Accept(this);
             double leftValue = GetLastExpressionValue();
@@ -532,6 +561,7 @@ namespace compiler.Interpreter.Visitor
             if (addSubExpressionNode == null)
             {
                 // pusty Node
+                throw new Exception("addSubExpressionNode is empty");
             }
             addSubExpressionNode.left.Accept(this);
             double leftValue = GetLastExpressionValue();
@@ -575,6 +605,7 @@ namespace compiler.Interpreter.Visitor
             if (mulDivExpressionNode == null)
             {
                 // pusty Node
+                throw new Exception("empty mulDivExpressionNode");
             }
             mulDivExpressionNode.left.Accept(this);
             double leftValue = GetLastExpressionValue();
@@ -618,6 +649,7 @@ namespace compiler.Interpreter.Visitor
             if (unaryExpressionNode == null)
             {
                 // pusty Node
+                throw new Exception("unaryExpressionNode is empty");
             }
             unaryExpressionNode.left.Accept(this);
             double leftValue = GetLastExpressionValue();
@@ -651,7 +683,7 @@ namespace compiler.Interpreter.Visitor
         {
             if (lastExpressionValues.Count != 1)
             {
-                Console.WriteLine("0 or 2+ Expression Values in the list");
+                throw new Exception("0 or 2+ Expression Values in the list (INTERPRETER ERROR)");
             }
             return lastExpressionValues[0].GetValueType();
         }
@@ -659,7 +691,7 @@ namespace compiler.Interpreter.Visitor
         {
             if (lastExpressionValues.Count != 1)
             {
-                Console.WriteLine("0 or 2+ Expression Values in the list");
+                throw new Exception("0 or 2+ Expression Values in the list (INTERPRETER ERROR)");
             }
             ValueType valueType = GetLastExpressionType();
             switch (valueType) 

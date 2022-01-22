@@ -23,18 +23,38 @@ namespace compiler
 
                 using (StreamWriter sr = new StreamWriter("test.txt", false))
                 {
-                    sr.Write("int main () { print(aaa) print(bbb) return 1}");
+                    sr.Write("int silnia(int a){    if(a < 1)    {        return -1    }    if(a == 1)    {        return 1    }    return silnia(a-1)*a} int main(){ print(Silnia) return silnia(5)}");
                 }
             }
             FileReader fileReader = new FileReader("test.txt");
             Scanner scanner = new Scanner(fileReader);
             Parser parser = new Parser(scanner);
-            parser.Parse();
+            try 
+            {
+                parser.Parse();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return;
+            }
+
+            
             SyntaxTree syntaxTreeResult = parser.syntaxTree;
 
             Visitor visitor = new Visitor();
             InterpreterClass interpreter = new InterpreterClass(syntaxTreeResult, visitor);
-            interpreter.Start();
+            
+
+            try
+            {
+                interpreter.Start();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return;
+            }
 
         }
     }

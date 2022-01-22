@@ -123,7 +123,7 @@ namespace compiler.Scanners
                         reader.MoveToNextChar();
                     }
                     token = new Token(TokenType.UNKNOWN, stringBuilder.ToString(), position);
-                    return true;
+                    throw new Exception("Invalid token " + stringBuilder.ToString() + ". Line: " + position.Item1.ToString() + ", PosInLine: " + position.Item2.ToString());
                 }
                 if (isDouble) 
                 {
@@ -174,16 +174,16 @@ namespace compiler.Scanners
                     // TODO: Commit wrong operator error to IError 
 
                     token = new Token(TokenType.UNKNOWN, text, position);
-
-                    return true;
+                    throw new Exception("Invalid token " + text + ". Line: " + position.Item1.ToString() + ", PosInLine: " + position.Item2.ToString());
                 }
             }
 
 
             token = new Token(TokenType.UNKNOWN, reader.currentChar.ToString(), position);
-            reader.MoveToNextChar();
+            throw new Exception("Invalid token " + reader.currentChar.ToString() + ". Line: " + position.Item1.ToString() + ", PosInLine: " + position.Item2.ToString());
 
             // TODO: Commit incorect sign error to IError
+            
 
             return false;
         }

@@ -61,18 +61,19 @@ namespace compiler.Parsers
             Token identifierToken = scanner.token;
             if(identifierToken.tokenType != TokenType.IDENTIFIER) 
             {
-                //obsluga bledu
+                throw new Exception("Wrong token in " + PositionToString(identifierToken.position) + ". Expected identifier");
             }
             scanner.NextToken();
             if(scanner.token.tokenType != TokenType.LEFT_ROUND_BRACKET) 
             {
                 //obsluga bledu nawiasu
+                throw new Exception("Wrong token in " + PositionToString(scanner.token.position) + ". Exprected LEFT_ROUND_BRACKET");
             }
             scanner.NextToken();
             ArgumentsListNode argumentsListNode = CreateArgumentsListNode();
             if(scanner.token.tokenType != TokenType.RIGHT_ROUND_BRACKET) 
             {
-                //obsluga bledu
+                throw new Exception("Wrong token in " + PositionToString(scanner.token.position) + ". Exprected RIGHT_ROUND_BRACKET");
             }
             scanner.NextToken();
             InstructionsBlockNode instructionsBlockNode = CreateInstructionsBlockNode();
@@ -86,7 +87,6 @@ namespace compiler.Parsers
             while(variableDefinitionNode != null) 
             {
                 variableDefinitionNodes.Add(variableDefinitionNode);
-                //brakuje przycinku
                 if (scanner.token.tokenType != TokenType.COMMA) 
                 {
                     return new ArgumentsListNode(variableDefinitionNodes);
@@ -106,6 +106,7 @@ namespace compiler.Parsers
                 if(identifier.tokenType != TokenType.IDENTIFIER) 
                 {
                     // obsluga bledu
+                    throw new Exception("Wrong token in " + PositionToString(identifier.position) + ". Expected identifier");
                 }
                 scanner.NextToken();
                 return new VariableDefinitionNode(typeName.tokenType, identifier.text);
@@ -117,17 +118,17 @@ namespace compiler.Parsers
         }
         private InstructionsBlockNode CreateInstructionsBlockNode() 
         {
-            //scanner.NextToken();
             if(scanner.token.tokenType != TokenType.LEFT_CURLY_BRACKET) 
             {
                 // obsluga bledu 
+                throw new Exception("Wrong token in " + PositionToString(scanner.token.position) + ". Exprected LEFT_CURLY_BRACKET");
             }
             scanner.NextToken();
             InstructionsListNode instructionsListNode = CreateInstructionsListNode();
 
             if(scanner.token.tokenType != TokenType.RIGHT_CURLY_BRACKET) 
             {
-                //obsluga bledu
+                throw new Exception("Wrong token in " + PositionToString(scanner.token.position) + ". Exprected RIGHT_CURLY_BRACKET");
             }
             return new InstructionsBlockNode(instructionsListNode);
         }
@@ -144,7 +145,6 @@ namespace compiler.Parsers
         }
         private IInstructionNode CreateInstructionNode() 
         {
-            //przeniesc if poziom nizej
             if(scanner.token.tokenType == TokenType.IF) 
             {
                 return CreateIfNode();
@@ -176,7 +176,7 @@ namespace compiler.Parsers
             scanner.NextToken();
             if(scanner.token.tokenType != TokenType.LEFT_ROUND_BRACKET) 
             {
-                // obsluga bledu
+                throw new Exception("Wrong token in " + PositionToString(scanner.token.position) + ". Exprected LEFT_ROUND_BRACKET");
             }
             scanner.NextToken();
             IExpressionNode expression = TryToCreateExpressionNode();
@@ -210,12 +210,14 @@ namespace compiler.Parsers
             if(scanner.token.tokenType != TokenType.LEFT_ROUND_BRACKET) 
             {
                 //obsluga bledu
+                throw new Exception("Wrong token in " + PositionToString(scanner.token.position) + ". Exprected LEFT_ROUND_BRACKET");
             }
             scanner.NextToken();
             IExpressionNode expression = TryToCreateExpressionNode();
             if(scanner.token.tokenType != TokenType.RIGHT_ROUND_BRACKET) 
             {
                 // obsluga bledu
+                throw new Exception("Wrong token in " + PositionToString(scanner.token.position) + ". Exprected RIGHT_ROUND_BRACKET");
             }
             scanner.NextToken();
             InstructionsBlockNode instructionsBlockNode = CreateInstructionsBlockNode();
@@ -252,7 +254,7 @@ namespace compiler.Parsers
             else 
             {
                 // obsluga bledu
-                return null;
+                throw new Exception("Wrong token in " + PositionToString(scanner.token.position) + ". Exprected ASSIGN or LEFT_ROUND_BRACKET");
             }
         }
         private ParametersListNode CreateParametersListNode() 
@@ -277,6 +279,7 @@ namespace compiler.Parsers
                 else
                 {
                     //obsluga bledu
+                    throw new Exception("Wrong token in " + PositionToString(scanner.token.position) + ". Exprected COMMA or RIGHT_ROUND_BRACKET");
                 }
 
             }
@@ -305,6 +308,7 @@ namespace compiler.Parsers
                 if(right == null) 
                 {
                     //nie ma prawego - wyjatek
+                    throw new Exception("Wrong token in " + PositionToString(scanner.token.position) + ". TryToCreateOrExpressionNode - nie ma prawego");
                 }
                 left = new OrExpressionNode(left, right, operatorToken);
             }
@@ -325,6 +329,7 @@ namespace compiler.Parsers
                 if (right == null)
                 {
                     //nie ma prawego - wyjatek
+                    throw new Exception("Wrong token in " + PositionToString(scanner.token.position) + ". TryToCreateAndExpressionNode - nie ma prawego");
                 }
                 left = new AndExpressionNode(left, right, operatorToken);
             }
@@ -356,7 +361,7 @@ namespace compiler.Parsers
                 IExpressionNode right = TryToCreateAddSubExpressionNode();
                 if (right == null)
                 {
-                    //nie ma prawego - wyjatek
+                    throw new Exception("Wrong token in " + PositionToString(scanner.token.position) + ". TryToCreateComparisonExpressionNode - nie ma prawego");
                 }
                 left = new ComparisonExpressionNode(left, right, operatorToken);
             }
@@ -376,7 +381,7 @@ namespace compiler.Parsers
                 IExpressionNode right = TryToCreateMulDivExpressionNode();
                 if (right == null)
                 {
-                    //nie ma prawego - wyjatek
+                    throw new Exception("Wrong token in " + PositionToString(scanner.token.position) + ". TryToCreateAddSubExpressionNode - nie ma prawego");
                 }
                 left = new AddSubExpressionNode(left, right, operatorToken);
             }
@@ -396,7 +401,7 @@ namespace compiler.Parsers
                 IExpressionNode right = TryToCreateUnaryExpressionNode();
                 if (right == null)
                 {
-                    //nie ma prawego - wyjatek
+                    throw new Exception("Wrong token in " + PositionToString(scanner.token.position) + ". TryToCreateUnaryExpressionNode - nie ma prawego");
                 }
                 left = new MulDivExpressionNode(left, right, operatorToken);
             }
@@ -427,7 +432,6 @@ namespace compiler.Parsers
                 }
                 else return new SimpleIdentifierNode(token);
             }
-            //rozdzielic SimpleExpressionNode na czesci
             if(scanner.token.tokenType == TokenType.NUMBER_INT ) 
             {
                 Token token = scanner.token;
@@ -447,14 +451,17 @@ namespace compiler.Parsers
                 //scanner.NextToken();
                 if(scanner.token.tokenType != TokenType.RIGHT_ROUND_BRACKET) 
                 {
-                    // obsluga bledu - brak nawiasu
+                    throw new Exception("Wrong token in " + PositionToString(scanner.token.position) + ". Expected RIGHT_ROUND_BRACKET");
                 }
                 scanner.NextToken();
                 return expression;
             }
             //obsluga bledu 
-            return null;
-
+            throw new Exception("Wrong token in " + PositionToString(scanner.token.position) + ". Expected LEFT_ROUND_BRACKET");
+        }
+        string PositionToString((int line, int posInLine) position) 
+        {
+            return "Line: " + position.line.ToString() + " Pos in line: " + position.posInLine.ToString();
         }
     }
 }
