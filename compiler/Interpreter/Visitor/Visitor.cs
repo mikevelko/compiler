@@ -392,13 +392,9 @@ namespace compiler.Interpreter.Visitor
                     lastExpressionValues.Add(new LastExpressionValueDouble(ValueDouble));
                     return;
                 }
-                else 
-                {
-                    // wyjatek - nie ma zmiennej o nazwie 
-                    throw new Exception("There is no variable - " + simpleIdentifierNode.value + "in current scope");
-                }
             }
-            
+            throw new Exception("There is no variable - " + simpleIdentifierNode.value + " in current scope");
+
         }
 
         public void Visit(AndExpressionNode andExpressionNode)
