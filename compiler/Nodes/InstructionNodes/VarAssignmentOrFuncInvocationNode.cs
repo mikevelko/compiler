@@ -13,7 +13,7 @@ namespace compiler.Nodes.InstructionNodes
     {
         public IExpressionNode expression;
         public (int, int) position;
-        public ParametersListNode identifierListNode;
+        public ParametersListNode parametersListNode;
 
         public VarAssignmentOrFuncInvocationNode(IExpressionNode expression, Token operatorAssignment)
         {
@@ -23,7 +23,7 @@ namespace compiler.Nodes.InstructionNodes
 
         public VarAssignmentOrFuncInvocationNode(ParametersListNode identifierListNode)
         {
-            this.identifierListNode = identifierListNode;
+            this.parametersListNode = identifierListNode;
         }
 
         public void Accept(IVisitor visitor)

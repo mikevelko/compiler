@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using compiler.Tokens;
+using System.Globalization;
 
 namespace compiler.Scanners
 {
@@ -126,7 +127,8 @@ namespace compiler.Scanners
                 }
                 if (isDouble) 
                 {
-                    token = new Token(TokenType.NUMBER_DOUBLE, Convert.ToDouble(stringBuilder.ToString()), position);
+                    double value = Double.Parse(stringBuilder.ToString(), CultureInfo.InvariantCulture);
+                    token = new Token(TokenType.NUMBER_DOUBLE, value, position);
                 }
                 else 
                 {

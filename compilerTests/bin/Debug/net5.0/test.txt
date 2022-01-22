@@ -1,1 +1,1 @@
-int main(){ a = foo() 
+int main(){ a = foo()} int foo() {} 

@@ -22,7 +22,7 @@ namespace compiler.Nodes.ExpressionNodes
 
         public void Accept(IVisitor visitor)
         {
-            throw new NotImplementedException();
+            visitor.Visit(this);
         }
     }
 }

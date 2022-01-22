@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace compiler.Interpreter
 {
-    public class Interpreter
+    public class InterpreterClass
     {
         
         public ProgramNode programNode;
         public IVisitor visitor;
 
-        public Interpreter(SyntaxTree tree , IVisitor visitor) 
+        public InterpreterClass(SyntaxTree tree , IVisitor visitor) 
         {
             this.visitor = visitor;
             this.programNode = tree.rootNode;

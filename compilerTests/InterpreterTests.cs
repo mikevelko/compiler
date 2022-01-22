@@ -30,7 +30,7 @@ namespace compilerTests
 
                 using (StreamWriter sr = new StreamWriter("test.txt", false))
                 {
-                    sr.Write("int main(){ a = foo() ");
+                    sr.Write("int main(){ a = foo()} int foo() {} ");
                 }
             }
             try
@@ -43,7 +43,7 @@ namespace compilerTests
                 SyntaxTree syntaxTreeResult = parser.syntaxTree;
 
                 Visitor visitor = new Visitor();
-                Interpreter interpreter = new Interpreter(syntaxTreeResult, visitor);
+                InterpreterClass interpreter = new InterpreterClass(syntaxTreeResult, visitor);
                 interpreter.Start();
             }
             catch

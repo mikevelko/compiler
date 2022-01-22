@@ -27,11 +27,24 @@ namespace compiler.Interpreter.Visitor
         public void Visit(ElseNode elseNode);
         public void Visit(WhileNode whileNode);
         public void Visit(IdentifierAssignmentOrInvocationNode identifierAssignmentOrInvocationNode);
+        public void Visit(ParametersListNode parametersListNode);
+        public void Visit(ReturnNode returnNode);
+
+
 
         //Expressions
         public void Visit(SimpleIntNode simpleIntNode);
+        public void Visit(SimpleDoubleNode simpleDoubleNode);
+        public void Visit(SimpleIdentifierNode simpleIdentifierNode);
 
+        public void Visit(AndExpressionNode andExpressionNode);
+        public void Visit(OrExpressionNode orExpressionNode);
+        public void Visit(LogicNegationExpressionNode logicNegationExpressionNode);
         public void Visit(ComparisonExpressionNode comparisonExpressionNode);
+        public void Visit(AddSubExpressionNode addSubExpressionNode);
+        public void Visit(MulDivExpressionNode mulDivExpressionNode);
+        public void Visit(UnaryExpressionNode unaryExpressionNode);
+        
 
         public void Visit(VarAssignmentOrFuncInvocationNode varAssignmentOrFuncInvocationNode);
     }

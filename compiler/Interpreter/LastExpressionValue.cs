@@ -6,13 +6,44 @@ using System.Threading.Tasks;
 
 namespace compiler.Interpreter
 {
-    public class LastExpressionValue
+    public interface ILastExpressionValue 
     {
-        public double LastValue;
+        ValueType GetValueType();
+    }
+    public class LastExpressionValueInt : ILastExpressionValue
+    {
+        public ValueType ValueType = ValueType.INT;
+        public int LastValue;
 
-        public LastExpressionValue(double lastValue)
+        public LastExpressionValueInt(int lastValue)
         {
             LastValue = lastValue;
         }
+
+        public ValueType GetValueType()
+        {
+            return ValueType;
+        }
+    }
+
+    public class LastExpressionValueDouble : ILastExpressionValue
+    {
+        public ValueType ValueType = ValueType.DOUBLE;
+        public double LastValue;
+
+        public LastExpressionValueDouble(double lastValue)
+        {
+            LastValue = lastValue;
+        }
+        public ValueType GetValueType()
+        {
+            return ValueType;
+        }
+    }
+
+    public enum ValueType 
+    {
+        INT,
+        DOUBLE
     }
 }
