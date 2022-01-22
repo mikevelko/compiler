@@ -23,7 +23,7 @@ namespace compiler
 
                 using (StreamWriter sr = new StreamWriter("test.txt", false))
                 {
-                    sr.Write("int silnia(int a){ return dupa(a+1) } int dupa(int a) {return a+1} int main(){ return 1/0}");
+                    sr.Write("int main () { print(aaa) print(bbb) return 1}");
                 }
             }
             FileReader fileReader = new FileReader("test.txt");

@@ -20,7 +20,8 @@ namespace compiler.Interpreter.Visitor
 
         List<ILastExpressionValue> lastExpressionValues;
         bool IsFunctionReturned;
-        ILastExpressionValue returnedValue;
+        bool IsPrintInvoked;
+        //ILastExpressionValue returnedValue;
         
         public Visitor() 
         {
@@ -28,6 +29,7 @@ namespace compiler.Interpreter.Visitor
             functionDefinitions = new List<FunctionNode>();
             lastExpressionValues = new List<ILastExpressionValue>();
             IsFunctionReturned = false;
+            IsPrintInvoked = false;
         }
         public void Visit(ProgramNode programNode)
         {
@@ -183,6 +185,8 @@ namespace compiler.Interpreter.Visitor
                 }
                 functionCallContexts.Peek().functionScopes.Pop();
                 whileNode.expressionNode.Accept(this);
+                value = GetLastExpressionValue();
+                ConsumeLastExpressionValue();
             }
         }
 
@@ -206,10 +210,85 @@ namespace compiler.Interpreter.Visitor
                 {
                     // wyjatek - nie ma definicji funkcji z taką nazwą 
                 }
-                functionCallContexts.Push(new FunctionCallContext(identifierAssignmentOrInvocationNode.identifier));
-                functionCallContexts.Peek().functionScopes.Push(new FunctionScope());
+                CreateParametersList(identifierAssignmentOrInvocationNode.varAssignmentOrFuncInvocationNode.parametersListNode, identifierAssignmentOrInvocationNode.identifier);
+                if (IsPrintInvoked) 
+                {
+                    IsPrintInvoked = false;
+                    return;
+                }
                 identifierAssignmentOrInvocationNode.varAssignmentOrFuncInvocationNode.Accept(this);
                 functionCallContexts.Pop();
+            }
+        }
+
+        public void CreateParametersList(ParametersListNode parametersListNode, string functionName) 
+        {
+            if(functionName == "print") 
+            {
+                if(parametersListNode.expressionFunctionParameters.Count != 1) 
+                {
+                    // wyjatek - liczba argumentow funkcji print nie jest 0
+                }
+                if(parametersListNode.expressionFunctionParameters[0] is SimpleIdentifierNode) 
+                {
+                    Console.WriteLine(((SimpleIdentifierNode)parametersListNode.expressionFunctionParameters[0]).value);
+                    IsPrintInvoked = true;
+                }
+                else
+                {
+                    // wyjatek - zly typ argumentu w print
+                }
+                return;
+            }
+
+            List<(ValueType type, double value, string identifier)> parameters = new List<(ValueType type, double value, string identifier)>();
+            FunctionNode funcDef = GetFunctionDefinition(functionName);
+            
+            if (parametersListNode.expressionFunctionParameters.Count != funcDef.argumentsListNodes.variableDefinitionNodes.Count())
+            {
+                //wyjatek arguments count is not the same in definition and invocation
+            }
+            int ParameterIndex = 0;
+            foreach (IExpressionNode expression in parametersListNode.expressionFunctionParameters)
+            {
+                expression.Accept(this);
+                double Argvalue = GetLastExpressionValue();
+                ValueType ArgType = GetLastExpressionType();
+                ConsumeLastExpressionValue();
+                if (ParameterIndex == funcDef.argumentsListNodes.variableDefinitionNodes.Count)
+                {
+                    //wyjatek definicja funkcji ma mniej parametrow niz w wywolaniu 
+                }
+                if(parameters.FindIndex(t => t.identifier == funcDef.argumentsListNodes.variableDefinitionNodes[ParameterIndex].identifier) >= 0) 
+                {
+                    //wyjatek definicja funkcji zawiera parametry z taką samą nazwą
+                }
+                if (funcDef.argumentsListNodes.variableDefinitionNodes[ParameterIndex].variableType == TokenType.INT && ArgType == ValueType.INT)
+                {
+                    parameters.Add((ArgType, Argvalue, funcDef.argumentsListNodes.variableDefinitionNodes[ParameterIndex].identifier));
+                }
+                else if (funcDef.argumentsListNodes.variableDefinitionNodes[ParameterIndex].variableType == TokenType.DOUBLE && ArgType == ValueType.DOUBLE)
+                {
+                    parameters.Add((ArgType, Argvalue, funcDef.argumentsListNodes.variableDefinitionNodes[ParameterIndex].identifier));
+                }
+                else
+                {
+                    // wyjatek - typ argumentu w definicji funkcji się nie zgadza z type argumentu w wywolaniu
+                }
+                ParameterIndex++;
+            }
+            functionCallContexts.Push(new FunctionCallContext(functionName));
+            functionCallContexts.Peek().functionScopes.Push(new FunctionScope());
+            foreach((ValueType type, double value, string identifier) item in parameters) 
+            {
+                if(item.type == ValueType.INT) 
+                {
+                    functionCallContexts.Peek().functionScopes.Peek().IntVariables.Add(item.identifier, (int)item.value);
+                }
+                else if (item.type == ValueType.DOUBLE) 
+                {
+                    functionCallContexts.Peek().functionScopes.Peek().DoubleVariables.Add(item.identifier, item.value);
+                }
             }
         }
 
@@ -222,39 +301,6 @@ namespace compiler.Interpreter.Visitor
         public void Visit(ParametersListNode parametersListNode) 
         {
             FunctionNode funcDef = GetFunctionDefinition();
-            if (parametersListNode.expressionFunctionParameters.Count != funcDef.argumentsListNodes.variableDefinitionNodes.Count()) 
-            {
-                //wyjatek arguments count is not the same in definition and invocation
-            }
-            int ParameterIndex = 0;
-            foreach(IExpressionNode expression in parametersListNode.expressionFunctionParameters) 
-            {
-                expression.Accept(this);
-                double Argvalue = GetLastExpressionValue();
-                ValueType ArgType = GetLastExpressionType();
-                ConsumeLastExpressionValue();
-                if(ParameterIndex == funcDef.argumentsListNodes.variableDefinitionNodes.Count) 
-                {
-                    //wyjatek definicja funkcji ma mniej parametrow niz w wywolaniu 
-                }
-                if (VariableExistsInCurrentFCC(funcDef.argumentsListNodes.variableDefinitionNodes[ParameterIndex].identifier))
-                {
-                    // wyjatek juz istnieje zmienna w FCC
-                }
-                if (funcDef.argumentsListNodes.variableDefinitionNodes[ParameterIndex].variableType == TokenType.INT && ArgType == ValueType.INT) 
-                {
-                    functionCallContexts.Peek().functionScopes.Peek().IntVariables.Add(funcDef.argumentsListNodes.variableDefinitionNodes[ParameterIndex].identifier, (int)Argvalue);
-                }
-                else if (funcDef.argumentsListNodes.variableDefinitionNodes[ParameterIndex].variableType == TokenType.DOUBLE && ArgType == ValueType.DOUBLE)
-                {
-                    functionCallContexts.Peek().functionScopes.Peek().DoubleVariables.Add(funcDef.argumentsListNodes.variableDefinitionNodes[ParameterIndex].identifier, Argvalue);
-                }
-                else 
-                {
-                    // wyjatek - typ argumentu w definicji funkcji się nie zgadza z type argumentu w wywolaniu
-                }
-                ParameterIndex++;
-            }
             funcDef.instructionsBlockNode.Accept(this);
             if (IsFunctionReturned)
             {
@@ -660,6 +706,17 @@ namespace compiler.Interpreter.Visitor
             return exists;
         }
 
+        FunctionNode GetFunctionDefinition(string name)
+        {
+            foreach (FunctionNode functionNode in functionDefinitions)
+            {
+                if (functionNode.identifier == name)
+                {
+                    return functionNode;
+                }
+            }
+            return null;
+        }
         FunctionNode GetFunctionDefinition()
         {
             foreach (FunctionNode functionNode in functionDefinitions)

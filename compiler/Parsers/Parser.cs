@@ -219,6 +219,7 @@ namespace compiler.Parsers
             }
             scanner.NextToken();
             InstructionsBlockNode instructionsBlockNode = CreateInstructionsBlockNode();
+            scanner.NextToken();
             return new WhileNode(expression, instructionsBlockNode);
         }
         private ReturnNode CreateReturnNode() 

@@ -1,1 +1,1 @@
-int silnia(int a){ return dupa(a+1) } int dupa(int a) {return a+1} int main(){ return 1/0}
+int main () { print(aaa) print(bbb) return 1}
